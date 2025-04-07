@@ -1,0 +1,47 @@
+#A simple program that scrapes event data from member organisations websites and generates an overview of open upcoming events that we can use for Sabimas calendar page.
+#Uses the web scraping library BeautifulSoup
+pip install requests beautifulsoup4
+
+import requests
+from bs4 import BeautifulSoup
+
+# List of URLs to scrape
+urls = [
+    "http://example.com/event1",
+    "http://example.com/event2",
+    # Add more URLs as needed
+]
+
+# Function to scrape events from a single URL
+def scrape_events(url):
+    response = requests.get(url)
+    if response.status_code != 200:
+        print(f"Failed to retrieve {url}")
+        return []
+
+    # Parse the HTML content
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # Extract events - customize this according to the structure of your target websites
+    events = []
+    for event in soup.find_all(class_='event-class'):  # Change 'event-class' to the relevant class name
+        title = event.find(class_='title-class').text.strip()  # Adjust class accordingly
+        date = event.find(class_='date-class').text.strip()    # Adjust class accordingly
+        events.append({'title': title, 'date': date})
+
+    return events
+
+# Main function to aggregate events from all URLs
+def main():
+    all_events = []
+    
+    for url in urls:
+        events = scrape_events(url)
+        all_events.extend(events)
+    
+    # Output the overview of all events
+    for event in all_events:
+        print(f"Event: {event['title']}, Date: {event['date']}")
+
+if __name__ == "__main__":
+    main()
